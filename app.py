@@ -32,7 +32,6 @@ def get_output_path(filename=None):
 
 
 def build_report_filename(report_number, project_name, suggestion_type):
-    """构建 检验编号+工程名称+轻型+合格/不合格.docx"""
     safe_number = report_number.strip().replace('/', '-').replace('\\', '-')
     safe_name = project_name.strip().replace('/', '-').replace('\\', '-')
     result = '合格' if suggestion_type == 'qualified' else '不合格'
@@ -62,33 +61,38 @@ def init_state():
         'suggestion_type': 'qualified',
         'foundation_area': '200',
         'testing_standards_page1': 'JGJ340-2015、DB42/T169-2022',
-        'testing_standards_chapter3': 'JGJ340-2015、DB42/T169-2022',
         'testing_standards_item1': '《建筑地基检测技术规范》（JGJ 340-2015）',
-        'testing_standards_item2': '《岩土工程勘察规程》（DB42/T 169-2022）',
+        'testing_standards_chapter3': '《岩土工程勘察规程》（DB42/T 169-2022）',
         'survey_company': '中国兵器工业北方勘察设计研究院有限公司',
         'design_company': '宜昌市城市规划设计研究院有限公司',
         'construction_company': '宜昌建投园林有限公司',
         'supervision_company': '湖北虹源工程咨询有限公司',
-        'project_manager': '杨勇',
+        'project_manager': '',
         'quality_station': '宜昌市市政工程质量安全监督站',
         'elevation_range': '81.782～81.959',
         'date_count': 1,
         'simple_pile_range': 'K0+534~K1+160段过街污水管道基础',
         'simple_foundation_type': '换填地基',
         'simple_soil_layer': '黏土',
+        # 新增字段
+        'witness': '杨勇',
+        'certificate_no': '——',
+        'structure_type': '——',
+        'base_type': '沟槽基础',
+        'base_elevation': '81.782～81.959',
+        'test_method': '采用轻型(10kg)动力触探试验',
+        'remark': '——',
     }
     for k, v in defaults.items():
         if k not in st.session_state:
             st.session_state[k] = v
 
-    # 仪器表格（固定2行）
     if 'instruments' not in st.session_state:
         st.session_state.instruments = [
             {'name': '轻型动力触探仪', 'number': 'S8-172', 'calib_date': '2026-09-11', 'cert_number': 'ZJS8-1712025017'},
             {'name': '钢卷尺', 'number': 'S9-22', 'calib_date': '2027-02-04', 'cert_number': '2026CD02051152'},
         ]
     
-    # 地质概况表格（可增删行）
     if 'geo_layers' not in st.session_state:
         st.session_state.geo_layers = [
             {'name': '第①层：填土', 'description': '杂色，稍湿～湿，松散～稍密，主要成分为黏性土，含植物根系、碎石，偶见混凝土块等。全场均有分布，本层工程性质较差，建议挖除。层厚0.20～8.80m，层底埋深0.20～8.80m，层底标高77.82～105.52m。'},
@@ -96,7 +100,6 @@ def init_state():
             {'name': '第③层：粉砂岩', 'description': '褐红色～青灰色，泥钙质胶结，层状结构，中厚层状构造，层理发育，清晰可见，岩体上部风化裂隙发育。岩石主要由长石、石英及黏土矿物组成，透水性差，断面含有少量灰白色、浅棕红色泥斑，夹灰白色粗砂岩。'},
         ]
     
-    # 表8原始数据
     if 'raw_data' not in st.session_state:
         st.session_state.raw_data = [
             {'point_id': '1#（YS7+10）', 'depth': '0.00~0.45', 'blows': '42、51'},
@@ -107,7 +110,6 @@ def init_state():
             {'point_id': '6#（YS8+30）', 'depth': '0.00~0.45', 'blows': '42、51'},
         ]
     
-    # 表9汇总数据（每条记录都包含 soil_layer）
     if 'summary_data' not in st.session_state:
         st.session_state.summary_data = [
             {'soil_layer': '素填土', 'point_id': '1#（YS7+10）', 'elevation': '81.782', 'avg_blows': '42.0', 'bearing_capacity': '208'},
@@ -118,7 +120,6 @@ def init_state():
             {'soil_layer': '素填土', 'point_id': '6#（YS8+30）', 'elevation': '81.959', 'avg_blows': '42.0', 'bearing_capacity': '208'},
         ]
     
-    # 附图
     if 'appendix_images' not in st.session_state:
         st.session_state.appendix_images = []
 
@@ -158,9 +159,9 @@ with col1:
         st.session_state.testing_standards_page1 = st.text_input(
             '检测依据（首页）', st.session_state.testing_standards_page1)
         st.session_state.testing_standards_item1 = st.text_input(
-            '检测依据第1条（第三章）', st.session_state.testing_standards_item1)
-        st.session_state.testing_standards_item2 = st.text_input(
-            '检测依据第2条（第三章）', st.session_state.testing_standards_item2)
+            '检测依据（第三章-第1条）', st.session_state.testing_standards_item1)
+        st.session_state.testing_standards_chapter3 = st.text_input(
+            '检测依据（第三章-第2条）', st.session_state.testing_standards_chapter3)
 
 with col2:
     with st.expander("首页检测信息", expanded=True):
@@ -178,6 +179,21 @@ with col2:
         st.session_state.pile_range = st.text_input('检测桩号范围', st.session_state.pile_range)
         st.session_state.test_conclusion = st.text_area(
             '检测结论 🔄', st.session_state.test_conclusion, height=80)
+        
+        st.markdown("---")
+        st.subheader("项目概况表参数")
+        
+        col_w1, col_w2 = st.columns(2)
+        with col_w1:
+            st.session_state.witness = st.text_input('见证人', st.session_state.witness)
+            st.session_state.structure_type = st.text_input('结构型式', st.session_state.structure_type)
+            st.session_state.base_type = st.text_input('基础类型', st.session_state.base_type)
+        with col_w2:
+            st.session_state.certificate_no = st.text_input('证书编号', st.session_state.certificate_no)
+            st.session_state.base_elevation = st.text_input('基底高程（m）', st.session_state.base_elevation)
+        
+        st.session_state.test_method = st.text_input('检测方法', st.session_state.test_method)
+        st.session_state.remark = st.text_input('备注', st.session_state.remark)
 
 # ===== 二、地质概况 =====
 with st.expander("二、地质概况", expanded=True):
@@ -289,7 +305,7 @@ with st.expander("四、检测结果（支持增删行 + 批量粘贴）", expan
                     })
             if rd:
                 st.session_state.raw_data = rd
-                st.success(f'{len(rd)} 行')
+                st.success(f'已替换为 {len(rd)} 行数据')
         raw_data = st.session_state.raw_data
         to_del = []
         for i, rd in enumerate(raw_data):
@@ -329,7 +345,7 @@ with st.expander("四、检测结果（支持增删行 + 批量粘贴）", expan
                     })
             if sd:
                 st.session_state.summary_data = sd
-                st.success(f'{len(sd)} 行')
+                st.success(f'已替换为 {len(sd)} 行数据')
         sum_data = st.session_state.summary_data
         to_del = []
         for i, sd in enumerate(sum_data):
@@ -349,27 +365,24 @@ with st.expander("四、检测结果（支持增删行 + 批量粘贴）", expan
             st.rerun()
 
 # ===== 五、结论与建议 =====
-# ===== 五、结论与建议 =====
 with st.expander("五、结论与建议", expanded=True):
     st.text_area('检测结论（自动同步首页）', st.session_state.test_conclusion, height=80, disabled=True)
     
     st.session_state.suggestion_on = st.checkbox('包含"建议"章节', value=st.session_state.suggestion_on)
     
     if st.session_state.suggestion_on:
-        # 合格/不合格选择（直接保存类型，不保存内容）
-        suggestion_type_options = ['合格', '不合格']
         selected_type = st.radio(
             '建议类型',
-            suggestion_type_options,
+            ['合格', '不合格'],
             index=0,
             horizontal=True
         )
         st.session_state.suggestion_type = 'qualified' if selected_type == '合格' else 'unqualified'
         
         if st.session_state.suggestion_type == 'qualified':
-            st.info('📌 建议内容：2、基础施工过程中，望有关部门加强截排水及验槽工作。')
+            st.success('✅ 当前选择：2、基础施工过程中，望有关部门加强截排水及验槽工作。')
         else:
-            st.warning('📌 建议内容：2、建议对不满足设计要求的地基采取有效方式进行相应处理后再进行下一步施工。')
+            st.error('⚠️ 当前选择：2、建议对不满足设计要求的地基采取有效方式进行相应处理后再进行下一步施工。')
 
 # ===== 六、附图 =====
 with st.expander("六、附图（可上传多张图片）", expanded=True):
@@ -407,7 +420,6 @@ if st.button('⬇ 生成报告', type='primary', use_container_width=True):
         try:
             test_date_str = '、'.join([d for d in st.session_state.test_dates if d.strip()])
 
-            # 自动计算报告日期
             first_date_raw = st.session_state.test_dates[0].strip() if st.session_state.test_dates else ''
             auto_report_date = ''
             try:
@@ -446,7 +458,7 @@ if st.button('⬇ 生成报告', type='primary', use_container_width=True):
                 'foundation_area': st.session_state.foundation_area,
                 'testing_standards_page1': st.session_state.testing_standards_page1,
                 'testing_standards_item1': st.session_state.testing_standards_item1,
-                'testing_standards_item2': st.session_state.testing_standards_item2,
+                'testing_standards_chapter3': st.session_state.testing_standards_chapter3,
                 'project_units': {
                     'survey': st.session_state.survey_company,
                     'design': st.session_state.design_company,
@@ -462,13 +474,20 @@ if st.button('⬇ 生成报告', type='primary', use_container_width=True):
                 'suggestion_on': st.session_state.suggestion_on,
                 'suggestion_type': st.session_state.suggestion_type,
                 'images': st.session_state.appendix_images,
+                # 新增字段
+                'witness': st.session_state.witness,
+                'certificate_no': st.session_state.certificate_no,
+                'structure_type': st.session_state.structure_type,
+                'base_type': st.session_state.base_type,
+                'base_elevation': st.session_state.base_elevation,
+                'test_method': st.session_state.test_method,
+                'remark': st.session_state.remark,
             }
 
             output_path = get_output_path(of if of.strip() else None)
             fill_document(TEMPLATE_PATH, output_path, data)
-            # refresh_toc(output_path, data.get('report_number', ''))  # 暂时禁用，避免卡死
+            # refresh_toc(output_path, data.get('report_number', ''))
 
-            # 生成规范文件名并重命名
             auto_filename = build_report_filename(
                 st.session_state.report_number,
                 st.session_state.project_name,
