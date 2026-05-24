@@ -82,6 +82,8 @@ def init_state():
         'base_elevation': '81.782～81.959',
         'test_method': '采用轻型(10kg)动力触探试验',
         'remark': '——',
+        'raw_paste_count': 0,
+        'sum_paste_count': 0,
     }
     for k, v in defaults.items():
         if k not in st.session_state:
@@ -305,17 +307,17 @@ with st.expander("四、检测结果（支持增删行 + 批量粘贴）", expan
                     })
             if rd:
                 st.session_state.raw_data = rd
+                st.session_state.raw_paste_count = st.session_state.get('raw_paste_count', 0) + 1
                 st.success(f'已替换为 {len(rd)} 行数据')
                 st.rerun()
         raw_data = st.session_state.raw_data
-        # 用全部数据 hash 做 key，确保任何改动都生成新 key
-        table_key = f"{len(raw_data)}_{hash(str(raw_data))}"
+        rk = st.session_state.get('raw_paste_count', 0)
         to_del = []
         for i, rd in enumerate(raw_data):
             c1, c2, c3, c4 = st.columns([2.5, 2, 2, 0.7])
-            with c1: raw_data[i]['point_id'] = st.text_input('点号', rd['point_id'], key=f'rid_{table_key}_{i}', label_visibility='collapsed')
-            with c2: raw_data[i]['depth'] = st.text_input('深度', rd['depth'], key=f'rdep_{table_key}_{i}', label_visibility='collapsed')
-            with c3: raw_data[i]['blows'] = st.text_input('击数', rd['blows'], key=f'rbl_{table_key}_{i}', label_visibility='collapsed')
+            with c1: raw_data[i]['point_id'] = st.text_input('点号', rd['point_id'], key=f'rid_{rk}_{i}', label_visibility='collapsed')
+            with c2: raw_data[i]['depth'] = st.text_input('深度', rd['depth'], key=f'rdep_{rk}_{i}', label_visibility='collapsed')
+            with c3: raw_data[i]['blows'] = st.text_input('击数', rd['blows'], key=f'rbl_{rk}_{i}', label_visibility='collapsed')
             with c4:
                 if st.button('✕', key=f'rdel_{i}'):
                     to_del.append(i)
@@ -348,19 +350,19 @@ with st.expander("四、检测结果（支持增删行 + 批量粘贴）", expan
                     })
             if sd:
                 st.session_state.summary_data = sd
+                st.session_state.sum_paste_count = st.session_state.get('sum_paste_count', 0) + 1
                 st.success(f'已替换为 {len(sd)} 行数据')
                 st.rerun()
         sum_data = st.session_state.summary_data
-        # 用全部数据 hash 做 key，确保任何改动都生成新 key
-        table_key = f"{len(sum_data)}_{hash(str(sum_data))}"
+        sk = st.session_state.get('sum_paste_count', 0)
         to_del = []
         for i, sd in enumerate(sum_data):
             c1, c2, c3, c4, c5, c6 = st.columns([1.5, 1.8, 1.3, 1.3, 1.3, 0.7])
-            with c1: sum_data[i]['soil_layer'] = st.text_input('土层', sd.get('soil_layer', '素填土'), key=f'ss_{table_key}_{i}', label_visibility='collapsed')
-            with c2: sum_data[i]['point_id'] = st.text_input('点号', sd['point_id'], key=f'sid_{table_key}_{i}', label_visibility='collapsed')
-            with c3: sum_data[i]['elevation'] = st.text_input('标高', sd['elevation'], key=f'se_{table_key}_{i}', label_visibility='collapsed')
-            with c4: sum_data[i]['avg_blows'] = st.text_input('击数', sd['avg_blows'], key=f'sa_{table_key}_{i}', label_visibility='collapsed')
-            with c5: sum_data[i]['bearing_capacity'] = st.text_input('承载力', sd['bearing_capacity'], key=f'sb_{table_key}_{i}', label_visibility='collapsed')
+            with c1: sum_data[i]['soil_layer'] = st.text_input('土层', sd.get('soil_layer', '素填土'), key=f'ss_{sk}_{i}', label_visibility='collapsed')
+            with c2: sum_data[i]['point_id'] = st.text_input('点号', sd['point_id'], key=f'sid_{sk}_{i}', label_visibility='collapsed')
+            with c3: sum_data[i]['elevation'] = st.text_input('标高', sd['elevation'], key=f'se_{sk}_{i}', label_visibility='collapsed')
+            with c4: sum_data[i]['avg_blows'] = st.text_input('击数', sd['avg_blows'], key=f'sa_{sk}_{i}', label_visibility='collapsed')
+            with c5: sum_data[i]['bearing_capacity'] = st.text_input('承载力', sd['bearing_capacity'], key=f'sb_{sk}_{i}', label_visibility='collapsed')
             with c6:
                 if st.button('✕', key=f'sdel_{i}'):
                     to_del.append(i)
