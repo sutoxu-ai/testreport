@@ -74,7 +74,6 @@ def init_state():
         'simple_pile_range': 'K0+534~K1+160段过街污水管道基础',
         'simple_foundation_type': '换填地基',
         'simple_soil_layer': '黏土',
-        # 新增字段
         'witness': '杨勇',
         'certificate_no': '——',
         'structure_type': '——',
@@ -290,22 +289,31 @@ with st.expander("四、检测结果（支持增删行 + 批量粘贴）", expan
             '粘贴表8数据（Tab分隔，每行3列）',
             placeholder='1#（YS7+10）\t0.00~0.45\t42、51\n2#（YS7+20）\t0.00~0.45\t41、51',
             height=80, key='raw_paste')
-        if st.button('📋 解析表8', key='pr1'):
-            lines = raw_paste.strip().split('\n')
-            rd = []
-            for line in lines:
-                if not line.strip():
-                    continue
-                parts = re.split(r'\t|\s{2,}', line.strip())
-                if len(parts) >= 2:
-                    rd.append({
-                        'point_id': parts[0],
-                        'depth': parts[1] if len(parts) > 1 else '',
-                        'blows': parts[2] if len(parts) > 2 else ''
-                    })
-            if rd:
-                st.session_state.raw_data = rd
-                st.success(f'已替换为 {len(rd)} 行数据')
+        
+        col_btn1, col_btn2 = st.columns(2)
+        with col_btn1:
+            if st.button('📋 解析表8', key='pr1'):
+                lines = raw_paste.strip().split('\n')
+                rd = []
+                for line in lines:
+                    if not line.strip():
+                        continue
+                    parts = re.split(r'\t|\s{2,}', line.strip())
+                    if len(parts) >= 2:
+                        rd.append({
+                            'point_id': parts[0],
+                            'depth': parts[1] if len(parts) > 1 else '',
+                            'blows': parts[2] if len(parts) > 2 else ''
+                        })
+                if rd:
+                    st.session_state.raw_data = rd
+                    st.success(f'已替换为 {len(rd)} 行数据')
+                    st.rerun()
+        with col_btn2:
+            if st.button('🗑️ 清空表8'):
+                st.session_state.raw_data = []
+                st.rerun()
+        
         raw_data = st.session_state.raw_data
         to_del = []
         for i, rd in enumerate(raw_data):
@@ -328,24 +336,33 @@ with st.expander("四、检测结果（支持增删行 + 批量粘贴）", expan
             '粘贴表9数据（Tab分隔，每行5列）',
             placeholder='素填土\t1#（YS7+10）\t81.782\t42.0\t208',
             height=80, key='sum_paste')
-        if st.button('📋 解析表9', key='ps2'):
-            lines = sum_paste.strip().split('\n')
-            sd = []
-            for line in lines:
-                if not line.strip():
-                    continue
-                parts = re.split(r'\t|\s{2,}', line.strip())
-                if len(parts) >= 4:
-                    sd.append({
-                        'soil_layer': parts[0] if parts[0] else '素填土',
-                        'point_id': parts[1] if len(parts) > 1 else '',
-                        'elevation': parts[2] if len(parts) > 2 else '',
-                        'avg_blows': parts[3] if len(parts) > 3 else '',
-                        'bearing_capacity': parts[4] if len(parts) > 4 else ''
-                    })
-            if sd:
-                st.session_state.summary_data = sd
-                st.success(f'已替换为 {len(sd)} 行数据')
+        
+        col_btn3, col_btn4 = st.columns(2)
+        with col_btn3:
+            if st.button('📋 解析表9', key='ps2'):
+                lines = sum_paste.strip().split('\n')
+                sd = []
+                for line in lines:
+                    if not line.strip():
+                        continue
+                    parts = re.split(r'\t|\s{2,}', line.strip())
+                    if len(parts) >= 4:
+                        sd.append({
+                            'soil_layer': parts[0] if parts[0] else '素填土',
+                            'point_id': parts[1] if len(parts) > 1 else '',
+                            'elevation': parts[2] if len(parts) > 2 else '',
+                            'avg_blows': parts[3] if len(parts) > 3 else '',
+                            'bearing_capacity': parts[4] if len(parts) > 4 else ''
+                        })
+                if sd:
+                    st.session_state.summary_data = sd
+                    st.success(f'已替换为 {len(sd)} 行数据')
+                    st.rerun()
+        with col_btn4:
+            if st.button('🗑️ 清空表9'):
+                st.session_state.summary_data = []
+                st.rerun()
+        
         sum_data = st.session_state.summary_data
         to_del = []
         for i, sd in enumerate(sum_data):
@@ -474,7 +491,6 @@ if st.button('⬇ 生成报告', type='primary', use_container_width=True):
                 'suggestion_on': st.session_state.suggestion_on,
                 'suggestion_type': st.session_state.suggestion_type,
                 'images': st.session_state.appendix_images,
-                # 新增字段
                 'witness': st.session_state.witness,
                 'certificate_no': st.session_state.certificate_no,
                 'structure_type': st.session_state.structure_type,
@@ -486,7 +502,6 @@ if st.button('⬇ 生成报告', type='primary', use_container_width=True):
 
             output_path = get_output_path(of if of.strip() else None)
             fill_document(TEMPLATE_PATH, output_path, data)
-            # refresh_toc(output_path, data.get('report_number', ''))
 
             auto_filename = build_report_filename(
                 st.session_state.report_number,
