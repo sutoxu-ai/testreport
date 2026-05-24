@@ -566,39 +566,25 @@ def fill_document(template_path, output_path, data):
                     run.text = ''
 
     # ===== 20. 表1（项目概况表）完整填充 =====
-    # ===== 20. 表1（项目概况表）完整填充 =====
     if len(doc.tables) > 1:
         t1 = doc.tables[1]
-        rows = len(t1.rows)
-        cols = len(t1.rows[0].cells) if rows > 0 else 0
-        
-        # 安全填充函数
-        def safe_set_cell(row, col, value):
-            """安全设置单元格，如果行列不存在则跳过"""
-            try:
-                # 行和列都是从1开始计数的
-                if row <= rows and col <= cols:
-                    t1.cell(row - 1, col - 1).text = str(value)
-            except:
-                pass
-        
-        # 根据您的模板实际结构填充
-        safe_set_cell(1, 2, data.get('project_name', ''))
-        safe_set_cell(2, 2, data.get('project_location', ''))
-        safe_set_cell(3, 2, data.get('client_name', ''))
-        safe_set_cell(4, 2, data.get('project_units', {}).get('survey', ''))
-        safe_set_cell(5, 2, data.get('project_units', {}).get('design', ''))
-        safe_set_cell(6, 2, data.get('project_units', {}).get('construction', ''))
-        safe_set_cell(7, 2, data.get('project_units', {}).get('supervision', ''))
-        safe_set_cell(8, 2, data.get('witness', ''))
-        safe_set_cell(8, 4, data.get('certificate_no', ''))
-        safe_set_cell(9, 2, data.get('project_units', {}).get('quality_station', ''))
-        safe_set_cell(10, 2, data.get('structure_type', ''))
-        safe_set_cell(10, 4, data.get('base_type', ''))
-        safe_set_cell(11, 2, data.get('bearing_capacities', ''))
-        safe_set_cell(11, 4, data.get('base_elevation', ''))
-        safe_set_cell(12, 2, data.get('test_method', ''))
-        safe_set_cell(12, 4, data.get('remark', ''))
+        if len(t1.rows) >= 12:
+            t1.cell(1, 2).text = data.get('project_name', '')
+            t1.cell(2, 2).text = data.get('project_location', '')
+            t1.cell(3, 2).text = data.get('client_name', '')
+            t1.cell(4, 2).text = data.get('project_units', {}).get('survey', '')
+            t1.cell(5, 2).text = data.get('project_units', {}).get('design', '')
+            t1.cell(6, 2).text = data.get('project_units', {}).get('construction', '')
+            t1.cell(7, 2).text = data.get('project_units', {}).get('supervision', '')
+            t1.cell(8, 2).text = data.get('witness', '')
+            t1.cell(8, 4).text = data.get('certificate_no', '')
+            t1.cell(9, 2).text = data.get('project_units', {}).get('quality_station', '')
+            t1.cell(10, 2).text = data.get('structure_type', '')
+            t1.cell(10, 4).text = data.get('base_type', '')
+            t1.cell(11, 2).text = data.get('bearing_capacities', '')
+            t1.cell(11, 4).text = data.get('base_elevation', '')
+            t1.cell(12, 2).text = data.get('test_method', '')
+            t1.cell(12, 4).text = data.get('remark', '')
 
     # ===== 21. 首页间距调整 =====
     for p in doc.paragraphs:
