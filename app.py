@@ -1,5 +1,5 @@
 """
-轻型动力触探检测报告自动生成工具
+轻型动力触探检测报告自动生成工具 v1.0
 """
 import streamlit as st
 import os
