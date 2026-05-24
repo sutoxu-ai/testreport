@@ -330,11 +330,11 @@ with st.expander("四、检测结果（支持增删行 + 批量粘贴）", expan
             raw_data.append({'point_id': '', 'depth': '', 'blows': ''})
             st.rerun()
 
-    with tab2:
-        st.caption('格式：土层 / 点号 / 标高 / 平均击数 / 承载力')
+        with tab2:
+        st.caption('格式：土层 / 点号 / 标高 / 平均击数 / 承载力（5列，Tab分隔）')
         sum_paste = st.text_area(
             '粘贴表9数据（Tab分隔，每行5列）',
-            placeholder='素填土\t1#（YS7+10）\t81.782\t42.0\t208',
+            placeholder='素填土\t1#（YS7+10）\t81.782\t42.0\t208\n素填土\t2#（YS7+20）\t81.812\t41.0\t204',
             height=80, key='sum_paste')
         
         col_btn3, col_btn4 = st.columns(2)
@@ -346,17 +346,27 @@ with st.expander("四、检测结果（支持增删行 + 批量粘贴）", expan
                     if not line.strip():
                         continue
                     parts = re.split(r'\t|\s{2,}', line.strip())
-                    if len(parts) >= 4:
+                    # 表9有5列
+                    if len(parts) >= 5:
                         sd.append({
                             'soil_layer': parts[0] if parts[0] else '素填土',
-                            'point_id': parts[1] if len(parts) > 1 else '',
-                            'elevation': parts[2] if len(parts) > 2 else '',
-                            'avg_blows': parts[3] if len(parts) > 3 else '',
-                            'bearing_capacity': parts[4] if len(parts) > 4 else ''
+                            'point_id': parts[1],
+                            'elevation': parts[2],
+                            'avg_blows': parts[3],
+                            'bearing_capacity': parts[4]
+                        })
+                    elif len(parts) == 4:
+                        # 兼容4列
+                        sd.append({
+                            'soil_layer': parts[0] if parts[0] else '素填土',
+                            'point_id': parts[1],
+                            'elevation': parts[2],
+                            'avg_blows': parts[3],
+                            'bearing_capacity': ''
                         })
                 if sd:
                     st.session_state.summary_data = sd
-                    st.success(f'已替换为 {len(sd)} 行数据')
+                    st.success(f'已替换为 {len(sd)} 行数据（5列）')
                     st.rerun()
         with col_btn4:
             if st.button('🗑️ 清空表9'):
@@ -364,6 +374,7 @@ with st.expander("四、检测结果（支持增删行 + 批量粘贴）", expan
                 st.rerun()
         
         sum_data = st.session_state.summary_data
+        # ... 后面的显示代码保持不变 ...
         to_del = []
         for i, sd in enumerate(sum_data):
             c1, c2, c3, c4, c5, c6 = st.columns([1.5, 1.8, 1.3, 1.3, 1.3, 0.7])
