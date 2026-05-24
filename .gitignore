@@ -1,0 +1,42 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+
+# 临时脚本和调试文件
+check_*.py
+diag_*.py
+debug_*.txt
+fix_*.py
+run_diag.py
+test_*.py
+build_dotm.py
+test_output.*.docx
+
+# 临时目录
+output/
+feedback_unpacked/
+template_unpacked/
+build/
+dist/
+
+# Word 临时文件
+~$*
+~WRL*.tmp
+
+# WorkBuddy 工作目录
+.workbuddy/
+
+# 备份目录
+BACKUP/
+
+# 用户上传的临时文档
+*.doc
+*~.doc*
+
+# 日志文件
+*.log
