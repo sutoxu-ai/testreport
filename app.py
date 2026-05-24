@@ -308,9 +308,8 @@ with st.expander("四、检测结果（支持增删行 + 批量粘贴）", expan
                 st.success(f'已替换为 {len(rd)} 行数据')
                 st.rerun()
         raw_data = st.session_state.raw_data
-        # 用数据长度 + hash 做 key，数据变了 key 一定变（Cloud 也生效）
-        _repr = str(raw_data[0] if raw_data else '')
-        table_key = f"{len(raw_data)}_{hash(_repr)}"
+        # 用全部数据 hash 做 key，确保任何改动都生成新 key
+        table_key = f"{len(raw_data)}_{hash(str(raw_data))}"
         to_del = []
         for i, rd in enumerate(raw_data):
             c1, c2, c3, c4 = st.columns([2.5, 2, 2, 0.7])
@@ -352,7 +351,8 @@ with st.expander("四、检测结果（支持增删行 + 批量粘贴）", expan
                 st.success(f'已替换为 {len(sd)} 行数据')
                 st.rerun()
         sum_data = st.session_state.summary_data
-        table_key = f"{len(sum_data)}_{hash(str(sum_data[:1]))}"
+        # 用全部数据 hash 做 key，确保任何改动都生成新 key
+        table_key = f"{len(sum_data)}_{hash(str(sum_data))}"
         to_del = []
         for i, sd in enumerate(sum_data):
             c1, c2, c3, c4, c5, c6 = st.columns([1.5, 1.8, 1.3, 1.3, 1.3, 0.7])
