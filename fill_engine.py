@@ -718,7 +718,7 @@ def fill_document(template_path, output_path, data):
 
     # ===== 25b. 修复标题前分页符导致的空行问题 =====
     # 将独立的分页段落改为在标题段落内部注入 w:br type="page"，避免空行
-    heading_targets = ['二、地质概况', '三、检测依据', '十、附图']
+    heading_targets = ['二、地质概况', '三、检测依据', '地基土承载力确定表', '十、附图']
     for pi, p in enumerate(doc.paragraphs):
         stripped = p.text.strip()
         if stripped in heading_targets:
