@@ -718,10 +718,24 @@ def fill_document(template_path, output_path, data):
 
     # ===== 25b. 修复标题前分页符导致的空行问题 =====
     # 将独立的分页段落改为在标题段落内部注入 w:br type="page"，避免空行
+
+    # 静态标题（精确匹配）
     heading_targets = ['二、地质概况', '三、检测依据', '地基土承载力确定表', '十、附图']
+
+    # 动态标题：第2页工程名称 = "圆锥动力触探试验检测报告"前一个非空段落
+    # 注意：Section 1 已替换工程名称文本，所以不能按文本匹配，需要按位置
+    extra_indices = set()
+    for pi, p in enumerate(doc.paragraphs):
+        if p.text.strip() == '圆锥动力触探试验检测报告':
+            if pi > 0:
+                prev_p = doc.paragraphs[pi - 1]
+                if prev_p.text.strip():
+                    extra_indices.add(pi - 1)
+            break
+
     for pi, p in enumerate(doc.paragraphs):
         stripped = p.text.strip()
-        if stripped in heading_targets:
+        if stripped in heading_targets or pi in extra_indices:
             p_elem = p._element
             # 1) 先移除标题段落自身的 pageBreakBefore（如果有的话），改用 w:br 注入
             pPr = p_elem.find(qn('w:pPr'))
