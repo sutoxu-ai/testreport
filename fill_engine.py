@@ -696,12 +696,11 @@ def fill_document(template_path, output_path, data):
                 img_run.add_picture(img_path, width=Inches(5.5))
                 img_p.alignment = WD_ALIGN_PARAGRAPH.CENTER
 
-    # ===== 25. 统一设置所有文字为楷体 =====
+    # ===== 25. 统一字体颜色为黑色（保持原字体不变）=====
     for p in doc.paragraphs:
         for run in p.runs:
             try:
-                run.font.name = '楷体'
-                run._element.rPr.rFonts.set(qn('w:eastAsia'), '楷体')
+                run.font.color.rgb = RGBColor(0, 0, 0)
             except:
                 pass
     
@@ -711,8 +710,7 @@ def fill_document(template_path, output_path, data):
                 for p in cell.paragraphs:
                     for run in p.runs:
                         try:
-                            run.font.name = '楷体'
-                            run._element.rPr.rFonts.set(qn('w:eastAsia'), '楷体')
+                            run.font.color.rgb = RGBColor(0, 0, 0)
                         except:
                             pass
 
